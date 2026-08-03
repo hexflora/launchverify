@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo.svg" alt="LaunchVerify logo" width="96" height="96"><br><br>
+<img src="logo.svg" alt="LaunchVerify logo" width="96" height="96">
 
 # launchverify
 
