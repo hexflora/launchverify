@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="logo.svg" alt="LaunchVerify logo" width="96" height="96"><br><br>
+
 # launchverify
 
 **Verify Windows executables, installers, and Authenticode signatures before launching applications.**
