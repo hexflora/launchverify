@@ -44,3 +44,33 @@ TEST_CASE("nonexistent file is an error") {
     auto r = lv::signature::verify_signature(std::filesystem::temp_directory_path() / "lv_no_such_file.exe");
     REQUIRE_FALSE(r);
 }
+
+TEST_CASE("self-signed exe exposes signer identity") {
+    auto r = lv::signature::verify_signature(fixture("signed-selfsigned.exe"));
+    REQUIRE(r);
+    REQUIRE(r->signer.has_value());
+    CHECK(r->signer->subject.find("LaunchVerify Test Signer") != std::string::npos);
+    CHECK(r->signer->sha256_thumbprint.size() == 64);
+}
+
+TEST_CASE("self-signed exe chain surfaces untrusted root") {
+    auto r = lv::signature::verify_signature(fixture("signed-selfsigned.exe"));
+    REQUIRE(r);
+    REQUIRE_FALSE(r->chain.empty());
+    bool saw_untrusted = false;
+    for (const auto& c : r->chain) {
+        if (c.status.find("UNTRUSTED") != std::string::npos) saw_untrusted = true;
+    }
+    CHECK(saw_untrusted);
+}
+
+TEST_CASE("expired-cert exe chain surfaces expiry") {
+    auto r = lv::signature::verify_signature(fixture("signed-expired.exe"));
+    REQUIRE(r);
+    REQUIRE_FALSE(r->chain.empty());
+    bool saw_expired = false;
+    for (const auto& c : r->chain) {
+        if (c.status.find("EXPIRED") != std::string::npos) saw_expired = true;
+    }
+    CHECK(saw_expired);
+}
